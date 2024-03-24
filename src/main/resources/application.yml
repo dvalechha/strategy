@@ -1,0 +1,16 @@
+spring:
+  data:
+    mongodb:
+      uri: "mongodb+srv://test-user-26:fYFp8znNlPTET3H7@my-test-cluster.lm9ld6t.mongodb.net/?retryWrites=true&w=majority&appName=my-test-cluster"
+      #host: "mongodb://test-user-26:fYFp8znNlPTET3H7@my-test-cluster.lm9ld6t.mongodb.net:27017/yourDB"
+      #port: "27017"
+      database: "my-test-db"   # MongoDB database name
+  datasource:
+    url: jdbc:h2:file:/Users/deepakvalechha/Learn/Code/data/demo
+    username: sa
+    password: password
+    driverClassName: org.h2.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop     # Create and drop tables on startup
