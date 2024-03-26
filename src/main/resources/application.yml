@@ -5,6 +5,9 @@ spring:
       #host: "mongodb://test-user-26:fYFp8znNlPTET3H7@my-test-cluster.lm9ld6t.mongodb.net:27017/yourDB"
       #port: "27017"
       database: "my-test-db"   # MongoDB database name
+  h2:
+    console:
+      enabled: true
   datasource:
     url: jdbc:h2:file:/Users/deepakvalechha/Learn/Code/data/demo
     username: sa
@@ -14,3 +17,10 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: create-drop     # Create and drop tables on startup
+
+logging:
+  level:
+    com:
+      example:
+        test:
+          strategy: INFO

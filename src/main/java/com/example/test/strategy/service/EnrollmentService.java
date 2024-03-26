@@ -1,23 +1,30 @@
 package com.example.test.strategy.service;
 
+import com.example.test.strategy.constants.Constants;
 import com.example.test.strategy.model.AccountPartnerMap;
 import com.example.test.strategy.model.Rules;
-import com.example.test.strategy.model.controller.MemberEnrollRequest;
+import com.example.test.strategy.model.controller.MemberRegisterationRequest;
 import com.example.test.strategy.model.PartnerMaster;
 import com.example.test.strategy.model.PartnerMember;
 import com.example.test.strategy.repository.AccountPartnerMapRepository;
 import com.example.test.strategy.repository.RulesRepository;
 import com.example.test.strategy.repository.PartnerMasterRepository;
 import com.example.test.strategy.repository.PartnerMemberRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
 
 @Service
 public class EnrollmentService {
+
+    Logger logger = LoggerFactory.getLogger(EnrollmentService.class);
 
     @Autowired
     private PartnerMasterRepository partnerMasterRepository;
@@ -31,16 +38,31 @@ public class EnrollmentService {
     @Autowired
     private RulesRepository rulesRepository;
 
+    @Autowired
+    private StrategyInterface strategyInterface;
+
     @Transactional
     public void enrollMember(String partnerLoyaltyId, String partnerCode, String clientCard) {
         // Task 1: Fetch ID from PTNR_MSTR table for partnerCode = 'GOOGLE'
-
     }
 
     @Transactional
-    public void enrollMember(MemberEnrollRequest memberEnrollRequest) {
-        String partnerCode = memberEnrollRequest.getPartnerCode();
-        String partnerLoyaltyId = memberEnrollRequest.getPartnerLoyaltyId();
+    public void registerMember(MemberRegisterationRequest memberRegisterationRequest) {
+        //Implement the core feature
+        registerMemberToLLDB(memberRegisterationRequest);
+
+        //Define all possible steps which may occur for one or more partner
+        List<Rules> rulesList = rulesRepository.findAll(); //The object "rulesList" can be stored in in-Memory Spring Cache
+        //enrollToAvion(rulesList, memberRegisterationRequest);
+        //enrollWithPartner(rulesList, memberRegisterationRequest);
+
+        strategyInterface.enrollToAvion(rulesList, memberRegisterationRequest);
+        strategyInterface.enrollWithPartner(rulesList, memberRegisterationRequest);
+    }
+
+    private void registerMemberToLLDB(MemberRegisterationRequest memberRegisterationRequest) {
+        String partnerCode = memberRegisterationRequest.getPartnerCode();
+        String partnerLoyaltyId = memberRegisterationRequest.getPartnerLoyaltyId();
 
         PartnerMaster partnerMaster = partnerMasterRepository.findByPartnerCode(partnerCode);
 
@@ -54,12 +76,7 @@ public class EnrollmentService {
                 //Enroll the member by persiting the info locally
                 partnerMemberRepository.save(partnerMember);
 
-                //Perform Avion enrollment
-                List<Rules> rulesList = rulesRepository.findAll();
 
-                //Perform partner Enrollment (External)
-
-                //Save an entry into the ACCNT_PTNR_MAP table
                 /*AccountPartnerMap accountPartnerMap = new AccountPartnerMap();
                 accountPartnerMap.setClientAccount(null);
                 accountPartnerMap.setPartnerMember(partnerMember);
@@ -67,6 +84,8 @@ public class EnrollmentService {
                 accountPartnerMapRepository.save(accountPartnerMap);*/
             } catch (Exception e) {
                 throw e;
+            } finally {
+                logger.info("Registration record was saved to LL DB");
             }
         } else {
             // Handle if partnerCode is not found
@@ -82,12 +101,12 @@ public class EnrollmentService {
     }
 
     @Transactional
-    public void unenrollMember(MemberEnrollRequest memberEnrollRequest) {
+    public void unenrollMember(MemberRegisterationRequest memberRegisterationRequest) {
         // Retrieve PartnerMaster entity based on partnerCode
-        PartnerMaster partnerMaster = partnerMasterRepository.findByPartnerCode(memberEnrollRequest.getPartnerCode());
+        PartnerMaster partnerMaster = partnerMasterRepository.findByPartnerCode(memberRegisterationRequest.getPartnerCode());
         if (partnerMaster != null) {
             // Retrieve PartnerMember entity based on partnerLoyaltyId and PTNR_MSTR_ID
-            PartnerMember partnerMember = partnerMemberRepository.findByPartnerLoyaltyIdAndPartnerMaster(memberEnrollRequest.getPartnerLoyaltyId(), partnerMaster);
+            PartnerMember partnerMember = partnerMemberRepository.findByPartnerLoyaltyIdAndPartnerMaster(memberRegisterationRequest.getPartnerLoyaltyId(), partnerMaster);
             if (partnerMember != null) {
                 // Remove the retrieved PartnerMember entity
                 partnerMemberRepository.delete(partnerMember);

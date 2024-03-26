@@ -1,6 +1,6 @@
 package com.example.test.strategy.controller;
 
-import com.example.test.strategy.model.controller.MemberEnrollRequest;
+import com.example.test.strategy.model.controller.MemberRegisterationRequest;
 import com.example.test.strategy.model.controller.MemberLinkRequest;
 import com.example.test.strategy.model.error.ErrorResponse;
 import com.example.test.strategy.service.EnrollmentService;
@@ -20,12 +20,12 @@ public class PartnerController {
     @Autowired
     private MemberLinkService memberLinkService;
 
-    @PostMapping("/member/enroll")
+    @PostMapping("/member/register")
     public ResponseEntity<?> enrollMember(
-                                @RequestBody MemberEnrollRequest memberEnrollRequest,
+                                @RequestBody MemberRegisterationRequest memberRegisterationRequest,
                                 @RequestHeader(value = "requestId", required = true) String requestId) {
         try {
-            enrollmentService.enrollMember(memberEnrollRequest);
+            enrollmentService.registerMember(memberRegisterationRequest);
             return ResponseEntity.ok("Enrollment Complete !!");
         } catch (Exception e) {
             //In actual implementation, different types of error should map to different codes
@@ -36,9 +36,9 @@ public class PartnerController {
 
     @PostMapping("/member/unenroll")
     public ResponseEntity<?> unenrollMember(@RequestHeader(value = "requestId", required = true) String requestId,
-                                                 @RequestBody MemberEnrollRequest memberEnrollRequest) {
+                                                 @RequestBody MemberRegisterationRequest memberRegisterationRequest) {
         try {
-            enrollmentService.unenrollMember(memberEnrollRequest);
+            enrollmentService.unenrollMember(memberRegisterationRequest);
             return ResponseEntity.ok("Un-enrollment Complete");
         } catch (Exception e) {
             ErrorResponse errorResponse = new ErrorResponse("LL-SVC-101",  e.getMessage());

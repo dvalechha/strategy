@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class MemberEnrollRequest {
+public class MemberRegisterationRequest {
 
     private String partnerLoyaltyId;
     private String clientCard;
